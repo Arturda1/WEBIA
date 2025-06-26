@@ -1,22 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Главное меню</title>
-</head>
-<body>
-  <h2>Привет, {{ user }}!</h2>
-  <ul>
-    <li><a href="/view-stock">📦 Посмотреть остатки материалов</a></li>
-    <li><a href="/register-operation">Зарегистрировать операцию</a></li>
-    <li><a href="/logout">🚪 Выйти</a></li>
-    <li><a href="/operations-log">📄 Посмотреть лог операций</a></li>
-    <li><a href="/salary-report">🧮 Посмотреть зарплату</a></li>
-    <li><a href="/calculate-cost">📊 Посчитать себестоимость</a></li>
-    <li><a href="/labor-cost">📊 Себестоимость по работам</a></li>
-    <li><a href="/add-purchase">📥 Добавить поставку</a></li>
+{% extends "base.html" %}
+{% block title %}Главное меню{% endblock %}
 
+{% block content %}
+<h2 class="mb-4">👋 Привет, {{ user }}!</h2>
 
-  </ul>
-</body>
-</html>
+<div class="d-grid gap-3">
+
+  <a href="/view-stock" class="btn btn-outline-primary btn-lg btn-icon">
+    <i class="bi bi-box-seam"></i> Остатки материалов
+  </a>
+
+  <a href="/register-operation" class="btn btn-outline-success btn-lg btn-icon">
+    <i class="bi bi-hammer"></i> Зарегистрировать операцию
+  </a>
+
+  <a href="/operations-log" class="btn btn-outline-secondary btn-lg btn-icon">
+    <i class="bi bi-clipboard-data"></i> Лог операций
+  </a>
+
+  <a href="/salary-report" class="btn btn-outline-warning btn-lg btn-icon">
+    <i class="bi bi-cash-coin"></i> Зарплаты
+  </a>
+
+  <a href="/calculate-cost" class="btn btn-outline-dark btn-lg btn-icon">
+    <i class="bi bi-calculator"></i> Себестоимость изделий
+  </a>
+
+  <a href="/labor-cost" class="btn btn-outline-dark btn-lg btn-icon">
+    <i class="bi bi-gear"></i> Себестоимость по работам
+  </a>
+
+  <a href="/add-purchase" class="btn btn-outline-info btn-lg btn-icon">
+    <i class="bi bi-box-arrow-in-down"></i> Добавить поставку
+  </a>
+
+  <a href="/logout" class="btn btn-outline-danger btn-lg btn-icon">
+    <i class="bi bi-box-arrow-right"></i> Выйти
+  </a>
+
+</div>
+{% endblock %}
