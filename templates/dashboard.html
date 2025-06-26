@@ -2,99 +2,33 @@
 {% block title %}Главное меню{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <div class="text-center mb-4">
-    <h2>👋 Привет, <strong>{{ user }}</strong>!</h2>
-  </div>
-
-  <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
-    <div class="col">
-      <a href="/view-stock" class="text-decoration-none">
-        <div class="card text-white bg-primary h-100 text-center p-4">
-          <i class="bi bi-box-seam fs-1"></i>
-          <div class="card-body">
-            <h5 class="card-title">Остатки материалов</h5>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <div class="col">
-      <a href="/register-operation" class="text-decoration-none">
-        <div class="card text-white bg-success h-100 text-center p-4">
-          <i class="bi bi-hammer fs-1"></i>
-          <div class="card-body">
-            <h5 class="card-title">Зарегистрировать операцию</h5>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <div class="col">
-      <a href="/operations-log" class="text-decoration-none">
-        <div class="card text-white bg-secondary h-100 text-center p-4">
-          <i class="bi bi-clipboard-data fs-1"></i>
-          <div class="card-body">
-            <h5 class="card-title">Лог операций</h5>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <div class="col">
-      <a href="/salary-report" class="text-decoration-none">
-        <div class="card text-white bg-warning h-100 text-center p-4">
-          <i class="bi bi-cash-coin fs-1"></i>
-          <div class="card-body">
-            <h5 class="card-title">Зарплаты</h5>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <div class="col">
-      <a href="/calculate-cost" class="text-decoration-none">
-        <div class="card text-white bg-dark h-100 text-center p-4">
-          <i class="bi bi-calculator fs-1"></i>
-          <div class="card-body">
-            <h5 class="card-title">Себестоимость изделий</h5>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <div class="col">
-      <a href="/labor-cost" class="text-decoration-none">
-        <div class="card text-white bg-info h-100 text-center p-4">
-          <i class="bi bi-gear fs-1"></i>
-          <div class="card-body">
-            <h5 class="card-title">Себестоимость по работам</h5>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <div class="col">
-      <a href="/add-purchase" class="text-decoration-none">
-        <div class="card text-white bg-success h-100 text-center p-4">
-          <i class="bi bi-box-arrow-in-down fs-1"></i>
-          <div class="card-body">
-            <h5 class="card-title">Добавить поставку</h5>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <div class="col">
-      <a href="/logout" class="text-decoration-none">
-        <div class="card text-white bg-danger h-100 text-center p-4">
-          <i class="bi bi-box-arrow-right fs-1"></i>
-          <div class="card-body">
-            <h5 class="card-title">Выйти</h5>
-          </div>
-        </div>
-      </a>
-    </div>
+<div class="text-center mt-5">
+  <h2 class="mb-4">👋 <strong>Привет, {{ user }}!</strong></h2>
+  <div class="d-grid gap-3 px-3" style="max-width: 600px; margin: 0 auto;">
+    <a href="/view-stock" class="btn btn-primary btn-lg d-flex align-items-center justify-content-center">
+      <i class="bi bi-box-seam me-2"></i> Остатки материалов
+    </a>
+    <a href="/register-operation" class="btn btn-success btn-lg d-flex align-items-center justify-content-center">
+      <i class="bi bi-hammer me-2"></i> Зарегистрировать операцию
+    </a>
+    <a href="/operations-log" class="btn btn-secondary btn-lg d-flex align-items-center justify-content-center">
+      <i class="bi bi-clipboard-data me-2"></i> Лог операций
+    </a>
+    <a href="/salary-report" class="btn btn-warning btn-lg d-flex align-items-center justify-content-center">
+      <i class="bi bi-cash-coin me-2"></i> Зарплаты
+    </a>
+    <a href="/calculate-cost" class="btn btn-dark btn-lg d-flex align-items-center justify-content-center">
+      <i class="bi bi-calculator me-2"></i> Себестоимость изделий
+    </a>
+    <a href="/labor-cost" class="btn btn-info btn-lg d-flex align-items-center justify-content-center">
+      <i class="bi bi-gear me-2"></i> Себестоимость по работам
+    </a>
+    <a href="/add-purchase" class="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-center">
+      <i class="bi bi-box-arrow-in-down me-2"></i> Добавить поставку
+    </a>
+    <a href="/logout" class="btn btn-outline-danger btn-lg d-flex align-items-center justify-content-center">
+      <i class="bi bi-box-arrow-right me-2"></i> Выйти
+    </a>
   </div>
 </div>
 {% endblock %}
