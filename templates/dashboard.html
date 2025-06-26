@@ -2,41 +2,99 @@
 {% block title %}Главное меню{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">👋 Привет, {{ user }}!</h2>
+<div class="container mt-5">
+  <div class="text-center mb-4">
+    <h2>👋 Привет, <strong>{{ user }}</strong>!</h2>
+  </div>
 
-<div class="d-grid gap-3">
+  <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+    <div class="col">
+      <a href="/view-stock" class="text-decoration-none">
+        <div class="card text-white bg-primary h-100 text-center p-4">
+          <i class="bi bi-box-seam fs-1"></i>
+          <div class="card-body">
+            <h5 class="card-title">Остатки материалов</h5>
+          </div>
+        </div>
+      </a>
+    </div>
 
-  <a href="/view-stock" class="btn btn-outline-primary btn-lg btn-icon">
-    <i class="bi bi-box-seam"></i> Остатки материалов
-  </a>
+    <div class="col">
+      <a href="/register-operation" class="text-decoration-none">
+        <div class="card text-white bg-success h-100 text-center p-4">
+          <i class="bi bi-hammer fs-1"></i>
+          <div class="card-body">
+            <h5 class="card-title">Зарегистрировать операцию</h5>
+          </div>
+        </div>
+      </a>
+    </div>
 
-  <a href="/register-operation" class="btn btn-outline-success btn-lg btn-icon">
-    <i class="bi bi-hammer"></i> Зарегистрировать операцию
-  </a>
+    <div class="col">
+      <a href="/operations-log" class="text-decoration-none">
+        <div class="card text-white bg-secondary h-100 text-center p-4">
+          <i class="bi bi-clipboard-data fs-1"></i>
+          <div class="card-body">
+            <h5 class="card-title">Лог операций</h5>
+          </div>
+        </div>
+      </a>
+    </div>
 
-  <a href="/operations-log" class="btn btn-outline-secondary btn-lg btn-icon">
-    <i class="bi bi-clipboard-data"></i> Лог операций
-  </a>
+    <div class="col">
+      <a href="/salary-report" class="text-decoration-none">
+        <div class="card text-white bg-warning h-100 text-center p-4">
+          <i class="bi bi-cash-coin fs-1"></i>
+          <div class="card-body">
+            <h5 class="card-title">Зарплаты</h5>
+          </div>
+        </div>
+      </a>
+    </div>
 
-  <a href="/salary-report" class="btn btn-outline-warning btn-lg btn-icon">
-    <i class="bi bi-cash-coin"></i> Зарплаты
-  </a>
+    <div class="col">
+      <a href="/calculate-cost" class="text-decoration-none">
+        <div class="card text-white bg-dark h-100 text-center p-4">
+          <i class="bi bi-calculator fs-1"></i>
+          <div class="card-body">
+            <h5 class="card-title">Себестоимость изделий</h5>
+          </div>
+        </div>
+      </a>
+    </div>
 
-  <a href="/calculate-cost" class="btn btn-outline-dark btn-lg btn-icon">
-    <i class="bi bi-calculator"></i> Себестоимость изделий
-  </a>
+    <div class="col">
+      <a href="/labor-cost" class="text-decoration-none">
+        <div class="card text-white bg-info h-100 text-center p-4">
+          <i class="bi bi-gear fs-1"></i>
+          <div class="card-body">
+            <h5 class="card-title">Себестоимость по работам</h5>
+          </div>
+        </div>
+      </a>
+    </div>
 
-  <a href="/labor-cost" class="btn btn-outline-dark btn-lg btn-icon">
-    <i class="bi bi-gear"></i> Себестоимость по работам
-  </a>
+    <div class="col">
+      <a href="/add-purchase" class="text-decoration-none">
+        <div class="card text-white bg-success h-100 text-center p-4">
+          <i class="bi bi-box-arrow-in-down fs-1"></i>
+          <div class="card-body">
+            <h5 class="card-title">Добавить поставку</h5>
+          </div>
+        </div>
+      </a>
+    </div>
 
-  <a href="/add-purchase" class="btn btn-outline-info btn-lg btn-icon">
-    <i class="bi bi-box-arrow-in-down"></i> Добавить поставку
-  </a>
-
-  <a href="/logout" class="btn btn-outline-danger btn-lg btn-icon">
-    <i class="bi bi-box-arrow-right"></i> Выйти
-  </a>
-
+    <div class="col">
+      <a href="/logout" class="text-decoration-none">
+        <div class="card text-white bg-danger h-100 text-center p-4">
+          <i class="bi bi-box-arrow-right fs-1"></i>
+          <div class="card-body">
+            <h5 class="card-title">Выйти</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
 </div>
 {% endblock %}
