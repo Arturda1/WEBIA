@@ -705,3 +705,11 @@ def download_file(filename):
     return send_from_directory("data", filename, as_attachment=True)
 
 
+@app.route("/debug-users")
+def debug_users():
+    import os, json
+    users_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "users.json")
+    if not os.path.exists(users_path):
+        return "<p>❌ Файл не найден</p>"
+    with open(users_path, "r", encoding="utf-8") as f:
+        return f"<pre>{json.dumps(json.load(f), ensure_ascii=False, indent=2)}</pre>"
