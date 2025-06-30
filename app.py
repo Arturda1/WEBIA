@@ -28,14 +28,8 @@ def login():
         password_input = request.form["password"]
 
         try:
-            if not os.path.exists(users_path):
-                os.makedirs(os.path.dirname(users_path), exist_ok=True)
-                with open(users_path, "w", encoding="utf-8") as f:
-                    json.dump([], f)
-
             with open(users_path, "r", encoding="utf-8") as f:
                 users = json.load(f)
-
         except Exception as e:
             return f"<p>❌ Ошибка загрузки users.json: {e}</p>"
 
@@ -48,6 +42,7 @@ def login():
         return render_template("login.html", error="Неверный логин или пароль")
 
     return render_template("login.html")
+
 
 
 

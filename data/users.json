@@ -1,23 +1,22 @@
 [
-    {
-      "login": "yana",
-      "password": "1213",
-      "name": "Яна"
-    },
-    {
-      "login": "ksusha",
-      "password": "3121",
-      "name": "Ксюша"
-    },
-    {
-      "login": "dovlat",
-      "password": "0109",
-      "name": "Довлат"
-    },
-    {
-      "login": "admin",
-      "password": "1488",
-      "name": "админ"
-    }
-  ]
-  
+  {
+    "login": "yana",
+    "password": "1213",
+    "name": "Яна"
+  },
+  {
+    "login": "ksusha",
+    "password": "3121",
+    "name": "Ксюша"
+  },
+  {
+    "login": "dovlat",
+    "password": "0109",
+    "name": "Довлат"
+  },
+  {
+    "login": "admin",
+    "password": "1488",
+    "name": "админ"
+  }
+]
