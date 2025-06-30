@@ -44,40 +44,6 @@ def login():
     return render_template("login.html")
 
 
-# --- Login page ---
-@app.route("/", methods=["GET", "POST"])
-def login():
-    import json
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    users_path = os.path.join(BASE_DIR, "data", "users.json")
-
-    print("Зашли на /")
-
-    if request.method == "POST":
-        login_input = request.form["username"]
-        password_input = request.form["password"]
-
-        try:
-            with open(users_path, "r", encoding="utf-8") as f:
-                users = json.load(f)
-        except Exception as e:
-            return f"<p>❌ Ошибка загрузки users.json: {e}</p>"
-
-        for u in users:
-            if u["login"] == login_input and u["password"] == password_input:
-                session["user"] = login_input
-                session["employee"] = u["name"]
-                return redirect(url_for("dashboard"))
-
-        return render_template("login.html", error="Неверный логин или пароль")
-
-    return render_template("login.html")
-
-
-
-
-
-
 # --- Dashboard ---
 @app.route("/dashboard")
 def dashboard():
