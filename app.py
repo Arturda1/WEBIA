@@ -2,6 +2,11 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+import zipfile
+import io
+from flask import send_file
+
+
 from flask import Flask, render_template, request, redirect, session, url_for
 import os
 import pandas as pd
@@ -634,5 +639,58 @@ def add_purchase():
 
 import os
 
+import zipfile
+from flask import send_file
+
+@app.route("/download-all")
+def download_all():
+    zip_path = "data/all_data.zip"
+    with zipfile.ZipFile(zip_path, "w") as zipf:
+        for file in os.listdir("data"):
+            full_path = os.path.join("data", file)
+            if os.path.isfile(full_path):
+                zipf.write(full_path, arcname=file)
+    return send_file(zip_path, as_attachment=True)
+
+
 
 # nothing else here — gunicorn handles app startup
+
+
+from flask import send_from_directory, render_template_string
+
+@app.route("/files")
+def list_files():
+    files = os.listdir("data")
+    return render_template_string('''
+        <h2>📁 Файлы в папке /data</h2>
+        <ul>
+        {% for f in files %}
+            <li><a href="/download/{{ f }}">{{ f }}</a></li>
+        {% endfor %}
+        </ul>
+        <br><a href='/dashboard'>⬅ Назад</a>
+    ''', files=files)
+
+@app.route("/download-all")
+def download_all_files():
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
+        for filename in os.listdir("data"):
+            file_path = os.path.join("data", filename)
+            if os.path.isfile(file_path):
+                zip_file.write(file_path, arcname=filename)
+    zip_buffer.seek(0)
+    return send_file(
+        zip_buffer,
+        mimetype='application/zip',
+        download_name='all_data.zip',
+        as_attachment=True
+    )
+
+
+@app.route("/download/<path:filename>")
+def download_file(filename):
+    return send_from_directory("data", filename, as_attachment=True)
+
+

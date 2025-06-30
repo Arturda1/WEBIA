@@ -4,3 +4,4 @@ __pycache__/
 .env
 *.pyc
 sync_data_from_railway.sh
+~$*.xlsx
