@@ -739,6 +739,6 @@ def debug_users():
     with open(users_path, "r", encoding="utf-8") as f:
         return f"<pre>{json.dumps(json.load(f), ensure_ascii=False, indent=2)}</pre>"
     
-    if __name__ == "__main__":
-        app.run(host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000)
 
