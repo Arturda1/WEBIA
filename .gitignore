@@ -5,3 +5,6 @@ __pycache__/
 *.pyc
 sync_data_from_railway.sh
 ~$*.xlsx
+.DS_Store
+data/~$*.xlsx
+

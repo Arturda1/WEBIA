@@ -12,7 +12,10 @@ import os
 import pandas as pd
 
 app = Flask(__name__, template_folder="templates")
-app.secret_key = "очень_секретная_строка"
+app.secret_key = os.environ.get("SECRET_KEY", "очень_секретная_строка")  # лучше через Railway переменные
+app.config['SESSION_COOKIE_SECURE'] = True  # обязательно для HTTPS
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # или 'None' если приложение встраивается в iframe
+
 
 
 @app.route("/", methods=["GET", "POST"])
