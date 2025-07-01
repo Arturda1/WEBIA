@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>📁 Файлы проекта</h2>
+    <p>Здесь можно будет скачать или заменить файлы данных.</p>
+    <ul>
+        <li><a href="/download/materials">materials.xlsx</a></li>
+        <li><a href="/download/purchases">purchases.xlsx</a></li>
+        <li><a href="/download/users">users.json</a></li>
+        <!-- добавь остальные ссылки при необходимости -->
+    </ul>
+</div>
+{% endblock %}
