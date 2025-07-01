@@ -533,39 +533,35 @@ def add_purchase():
         return redirect(url_for("login"))
 
     import pandas as pd
-    import traceback
+    import os
     from datetime import datetime
 
     path = "data/purchases.xlsx"
 
-    # 🧱 Попытка загрузить файл
-    try:
-        if os.path.exists(path):
-            df = pd.read_excel(path)
-            assert all(col in df.columns for col in [
-                "Дата", "Доставка ID", "Контрагент", "Материал", "Ед. изм.",
-                "Кол-во упаковок", "Кол-во в упаковке", "Цена (за упаковку)",
-                "Стоимость (общая)", "Стоимость доставки", "Комментарий",
-                "Источник оплаты", "Категория расходов", "Вид расходов"
-            ])
-        else:
+    # 🧱 Загружаем файл или создаём с нуля
+    if os.path.exists(path):
+        df = pd.read_excel(path)
+        if df.empty:
             df = pd.DataFrame(columns=[
                 "Дата", "Доставка ID", "Контрагент", "Материал", "Ед. изм.",
                 "Кол-во упаковок", "Кол-во в упаковке", "Цена (за упаковку)",
                 "Стоимость (общая)", "Стоимость доставки", "Комментарий",
                 "Источник оплаты", "Категория расходов", "Вид расходов"
             ])
-    except Exception as e:
-        print("❌ Ошибка загрузки purchases.xlsx:")
-        traceback.print_exc()
-        return f"<p style='color:red'>❌ Ошибка при чтении purchases.xlsx: {e}</p><a href='/dashboard'>⬅ Назад</a>"
+    else:
+        df = pd.DataFrame(columns=[
+            "Дата", "Доставка ID", "Контрагент", "Материал", "Ед. изм.",
+            "Кол-во упаковок", "Кол-во в упаковке", "Цена (за упаковку)",
+            "Стоимость (общая)", "Стоимость доставки", "Комментарий",
+            "Источник оплаты", "Категория расходов", "Вид расходов"
+        ])
 
-    # 🔄 Подгрузка списков
-    contractors = sorted(df["Контрагент"].dropna().unique().tolist()) if not df.empty else []
-    materials = sorted(df["Материал"].dropna().unique().tolist()) if not df.empty else []
-
+    contractors = sorted(df["Контрагент"].dropna().unique().tolist())
+    materials = sorted(df["Материал"].dropna().unique().tolist())
     selected_contractor = ""
-    payment_sources, expense_categories, expense_types = [], [], []
+    payment_sources = []
+    expense_categories = []
+    expense_types = []
 
     if request.method == "POST":
         mode = request.form.get("mode", "")
@@ -574,14 +570,12 @@ def add_purchase():
         selected_contractor = new_contractor or selected_contractor
 
         if mode != "save":
-            try:
-                filtered_df = df[df["Контрагент"] == selected_contractor]
-                materials = sorted(filtered_df["Материал"].dropna().unique().tolist())
-                payment_sources = sorted(filtered_df["Источник оплаты"].dropna().unique().tolist())
-                expense_categories = sorted(filtered_df["Категория расходов"].dropna().unique().tolist())
-                expense_types = sorted(filtered_df["Вид расходов"].dropna().unique().tolist())
-            except:
-                materials = []
+            filtered_df = df[df["Контрагент"] == selected_contractor]
+            materials = sorted(filtered_df["Материал"].dropna().unique().tolist())
+            payment_sources = sorted(filtered_df["Источник оплаты"].dropna().unique().tolist())
+            expense_categories = sorted(filtered_df["Категория расходов"].dropna().unique().tolist())
+            expense_types = sorted(filtered_df["Вид расходов"].dropna().unique().tolist())
+
             return render_template("add_purchase.html",
                 contractors=contractors,
                 materials=materials,
@@ -591,7 +585,6 @@ def add_purchase():
                 expense_types=expense_types
             )
 
-        # 💾 Сохраняем поставку
         try:
             date = datetime.strptime(request.form.get("date"), "%Y-%m-%d")
             contractor = new_contractor or request.form.get("contractor")
@@ -601,7 +594,7 @@ def add_purchase():
             expense_category = request.form.get("expense_category", "").strip()
             expense_type = request.form.get("expense_type", "").strip()
 
-            existing_ids = df["Доставка ID"].dropna().astype(str).tolist() if not df.empty else []
+            existing_ids = df["Доставка ID"].dropna().astype(str).tolist()
             last_number = max([int(x[1:]) for x in existing_ids if x.startswith("D") and x[1:].isdigit()] + [0])
             delivery_id = f"D{last_number+1:04d}"
 
@@ -615,9 +608,17 @@ def add_purchase():
                 unit = request.form.get(f"unit_{index}", "шт")
                 qty_packs = float(request.form.get(f"qty_packs_{index}") or 0)
                 units_per_pack = float(request.form.get(f"units_per_pack_{index}") or 1)
-                price_per_pack = float(request.form.get(f"price_per_pack_{index}") or 0)
+                price_per_pack = request.form.get(f"price_per_pack_{index}")
                 total_cost = float(request.form.get(f"total_cost_{index}") or 0)
                 comment = request.form.get(f"comment_{index}", "")
+
+                if not price_per_pack or price_per_pack.strip() == "":
+                    try:
+                        price_per_pack = round(total_cost / qty_packs, 4) if qty_packs else 0
+                    except:
+                        price_per_pack = 0
+                else:
+                    price_per_pack = float(price_per_pack)
 
                 row = {
                     "Дата": date,
@@ -638,7 +639,7 @@ def add_purchase():
                 rows.append(row)
                 index += 1
 
-            if delivery_cost and len(rows) > 0:
+            if delivery_cost and rows:
                 rows[0]["Стоимость доставки"] = delivery_cost
 
             df = pd.concat([df, pd.DataFrame(rows)], ignore_index=True)
@@ -647,36 +648,17 @@ def add_purchase():
             return "<p style='color:green'>✅ Поставка добавлена.</p><a href='/add-purchase'>Добавить ещё</a> | <a href='/dashboard'>🏠 В меню</a>"
 
         except Exception as e:
-            print("❌ Ошибка при сохранении поставки:")
-            traceback.print_exc()
-            return f"<p style='color:red'>❌ Ошибка сохранения: {e}</p><a href='/add-purchase'>↩ Назад</a>"
+            return f"<p>❌ Ошибка: {e}</p><a href='/add-purchase'>↩ Назад</a>"
 
     return render_template("add_purchase.html",
         contractors=contractors,
         materials=materials,
         selected_contractor=selected_contractor,
-        payment_sources=[],
-        expense_categories=[],
-        expense_types=[]
+        payment_sources=payment_sources,
+        expense_categories=expense_categories,
+        expense_types=expense_types
     )
 
-
-@app.route("/download-all")
-def download_all():
-    zip_path = "data/all_data.zip"
-    with zipfile.ZipFile(zip_path, "w") as zipf:
-        for file in os.listdir("data"):
-            full_path = os.path.join("data", file)
-            if os.path.isfile(full_path):
-                zipf.write(full_path, arcname=file)
-    return send_file(zip_path, as_attachment=True)
-
-
-
-# nothing else here — gunicorn handles app startup
-
-
-from flask import send_from_directory, render_template_string
 
 @app.route("/files")
 def list_files():

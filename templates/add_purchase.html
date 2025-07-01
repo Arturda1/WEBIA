@@ -110,7 +110,7 @@ function addRow() {
       </div>
       <div class="col">
         <label>Кол-во в упаковке:</label>
-        <input name="units_per_pack_${index}" type="number" step="0.01" class="form-control">
+    <input name="qty_packs_${index}" type="number" step="0.01" class="form-control" oninput="recalculatePrice(${index})">
       </div>
     </div>
     <div class="row mt-2">
@@ -119,7 +119,7 @@ function addRow() {
         <input name="price_per_pack_${index}" type="number" step="0.01" class="form-control">
       </div>
       <div class="col">
-        <label>Стоимость (общая):</label>
+    <input name="total_cost_${index}" type="number" step="0.01" class="form-control" oninput="recalculatePrice(${index})">
         <input name="total_cost_${index}" type="number" step="0.01" class="form-control">
       </div>
       <div class="col">
@@ -132,4 +132,21 @@ function addRow() {
   index++;
 }
 </script>
+
+<script>
+    function recalculatePrice(index) {
+      const price = document.querySelector(`input[name="price_per_pack_${index}"]`);
+      const cost = document.querySelector(`input[name="total_cost_${index}"]`);
+      const qty = document.querySelector(`input[name="qty_packs_${index}"]`);
+    
+      if (price && cost && qty && !price.value) {
+        const total = parseFloat(cost.value || 0);
+        const amount = parseFloat(qty.value || 0);
+        if (amount > 0) {
+          price.value = (total / amount).toFixed(4);
+        }
+      }
+    }
+    </script>
+    
 {% endblock %}
