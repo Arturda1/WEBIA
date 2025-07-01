@@ -6,6 +6,8 @@ import zipfile
 import io
 from flask import send_file
 
+from flask import render_template_string
+
 
 from flask import Flask, render_template, request, redirect, session, url_for
 import os
@@ -568,10 +570,12 @@ def add_purchase():
         selected_contractor = request.form.get("contractor") or ""
         new_contractor = request.form.get("new_contractor", "").strip()
         selected_contractor = new_contractor or selected_contractor
-
         if mode != "save":
             filtered_df = df[df["Контрагент"] == selected_contractor]
-            materials = sorted(filtered_df["Материал"].dropna().unique().tolist())
+            materials = sorted([
+                m for m in filtered_df["Материал"].dropna().unique().tolist()
+                if str(m).strip()
+            ])
             payment_sources = sorted(filtered_df["Источник оплаты"].dropna().unique().tolist())
             expense_categories = sorted(filtered_df["Категория расходов"].dropna().unique().tolist())
             expense_types = sorted(filtered_df["Вид расходов"].dropna().unique().tolist())
