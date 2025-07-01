@@ -533,15 +533,19 @@ def add_purchase():
         return redirect(url_for("login"))
 
     path = "data/purchases.xlsx"
-    if os.path.exists(path):
-        df = pd.read_excel(path)
-    else:
-        df = pd.DataFrame(columns=[
-            "Дата", "Доставка ID", "Контрагент", "Материал", "Ед. изм.",
-            "Кол-во упаковок", "Кол-во в упаковке", "Цена (за упаковку)",
-            "Стоимость (общая)", "Стоимость доставки", "Комментарий",
-            "Источник оплаты", "Категория расходов", "Вид расходов"
-        ])
+    try:
+        if os.path.exists(path):
+            df = pd.read_excel(path)
+        else:
+            df = pd.DataFrame(columns=[
+                "Дата", "Доставка ID", "Контрагент", "Материал", "Ед. изм.",
+                "Кол-во упаковок", "Кол-во в упаковке", "Цена (за упаковку)",
+                "Стоимость (общая)", "Стоимость доставки", "Комментарий",
+                "Источник оплаты", "Категория расходов", "Вид расходов"
+            ])
+    except Exception as e:
+        return f"<p style='color:red'>❌ Ошибка при загрузке purchases.xlsx: {e}</p><a href='/dashboard'>⬅ Назад</a>"
+
 
     contractors = sorted(df["Контрагент"].dropna().unique().tolist())
     materials = sorted(df["Материал"].dropna().unique().tolist())
