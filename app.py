@@ -78,17 +78,47 @@ def view_stock():
         save_materials(df)
         return "<p>✅ Остатки обновлены.</p><a href='/view-stock'>↩ Вернуться</a> | <a href='/dashboard'>🏠 В меню</a>"
 
-    html = "<h2>📦 Остатки материалов + Изменения</h2>"
-    html += "<form method='post'><table border='1' cellpadding='5'>"
-    html += "<tr><th>№</th><th>Название</th><th>Ед.</th><th>Текущий остаток</th><th>Изменение</th></tr>"
+    # Сборка HTML
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Остатки материалов</title>
+        <style>
+            body { font-family: sans-serif; background: #f7f7f7; padding: 30px; }
+            h2 { color: #333; }
+            table { border-collapse: collapse; width: 100%; background: white; }
+            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            th { background: #eee; }
+            input[type="text"] { width: 100%; box-sizing: border-box; }
+            button { margin-top: 15px; padding: 10px 20px; background: black; color: white; border: none; cursor: pointer; }
+            button:hover { background: #333; }
+            a { display: inline-block; margin-top: 15px; }
+        </style>
+    </head>
+    <body>
+    <h2>📦 Остатки материалов + Изменения</h2>
+    <form method="post">
+    <table>
+    <tr><th>№</th><th>Название</th><th>Ед.</th><th>Текущий остаток</th><th>Изменение</th></tr>
+    """
 
     for i, row in df.iterrows():
         html += f"<tr><td>{i+1}</td><td>{row['Название']}</td><td>{row['Ед. изм.']}</td>"
         html += f"<td>{row['Остаток']}</td><td><input type='text' name='m_{i}'></td></tr>"
 
-    html += "</table><br><button type='submit'>💾 Сохранить изменения</button></form>"
-    html += "<br><a href='/dashboard'>⬅ Назад</a>"
+    html += """
+    </table><br>
+    <button type="submit">💾 Сохранить изменения</button>
+    </form>
+    <br><a href='/dashboard'>⬅ Назад</a>
+    </body>
+    </html>
+    """
+
     return html
+
 
 
 @app.route("/produce", methods=["GET", "POST"])
@@ -705,6 +735,17 @@ def debug_users():
     with open(users_path, "r", encoding="utf-8") as f:
         return f"<pre>{json.dumps(json.load(f), ensure_ascii=False, indent=2)}</pre>"
     
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    if __name__ == "__main__":
+        app.run(host="0.0.0.0", port=8000)
+
+
+
+
+#if __name__ == "__main__":
+    if os.environ.get("RAILWAY_ENVIRONMENT") == "production":
+        # Для Railway — НЕ ТРОГАЙ
+        app.run(host="0.0.0.0", port=8000)
+    else:
+        # Локальный запуск
+        app.run(debug=True, port=5000)
 

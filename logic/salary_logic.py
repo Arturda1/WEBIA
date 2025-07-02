@@ -39,9 +39,9 @@ def register_operation(employee, operation, qty):
 
     rate = rate_row.iloc[0]["Ставка (₽)"]
     total = round(rate * qty, 2)
-    date = datetime.now().strftime("%Y-%m-%d")
+    date = datetime.now()  # ← сохраняем как datetime, не строку
 
-    product = operation  # операция = наименование продукта
+    product = operation
 
     try:
         use_materials_for_product(product, qty)
@@ -55,6 +55,7 @@ def register_operation(employee, operation, qty):
 
     log_operation(date, employee, operation, product, qty, rate, total)
     print(f"✅ {employee} → {operation} × {qty} → {total} ₽ записано в лог.")
+
 
 def operation_input_menu():
     print("\\n📋 Ввод выполненных операций")
