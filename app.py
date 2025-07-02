@@ -1,14 +1,11 @@
 import os
 from dotenv import load_dotenv
 load_dotenv()
-
 import zipfile
 import io
 from flask import send_file
-
+from flask import send_from_directory
 from flask import render_template_string
-
-
 from flask import Flask, render_template, request, redirect, session, url_for
 import os
 import pandas as pd
@@ -671,7 +668,7 @@ def list_files():
         <h2>📁 Файлы в папке /data</h2>
         <ul>
         {% for f in files %}
-            <li><a href="/download/{{ f }}">{{ f }}</a></li>
+            <li><a href="/download/{{ f }}" target="_blank" rel="noopener">{{ f }}</a></li>
         {% endfor %}
         </ul>
         <br><a href='/dashboard'>⬅ Назад</a>
