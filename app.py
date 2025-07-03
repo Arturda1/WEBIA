@@ -21,7 +21,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    users_path = os.path.join("data", "users.json")
+    users_path = os.path.join(BASE_DIR, "data", "users_data.json")
     if request.method == "POST":
         login_input = request.form.get("username")
         password_input = request.form.get("password")
