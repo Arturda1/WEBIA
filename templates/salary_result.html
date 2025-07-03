@@ -1,0 +1,9 @@
+<!-- templates/salary_result.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h2>Зарплата за период {{ start }} – {{ end }}</h2>
+  <div>
+    {{ table_html|safe }}
+  </div>
+  <a href="{{ url_for('dashboard') }}">Назад</a>
+{% endblock %}
