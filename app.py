@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# исправленный путь к data/users.json (на уровень выше)
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+users_path = os.path.join("data", "users.json")
+
 
 import zipfile
 import io
@@ -28,7 +28,6 @@ def home():
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    users_path = os.path.join(BASE_DIR, "data", "users.json")
     if request.method == "POST":
         login_input = request.form.get("username")
         password_input = request.form.get("password")
