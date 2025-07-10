@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# исправленный путь к data/users.json (на уровень выше)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 import zipfile
 import io
@@ -23,7 +24,6 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 @app.route("/")
 def home():
     return redirect(url_for("login"))
-
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
