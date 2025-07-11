@@ -1,45 +1,27 @@
-# import os
-# from dotenv import load_dotenv
-# load_dotenv()
-# import zipfile
-# import io
-# from flask import send_file
-# from flask import send_from_directory
-# from flask import render_template_string
-# from flask import Flask, render_template, request, redirect, session, url_for
-# import os
-# import pandas as pd
-
-
-
-# IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT") == "production"
-
-# app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
-# app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-
-
-# app = Flask(__name__, template_folder="templates")
-# app.secret_key = os.environ.get("SECRET_KEY", "очень_секретная_строка")  # лучше через Railway переменные
-# app.config['SESSION_COOKIE_SECURE'] = True  # обязательно для HTTPS
-# app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # или 'None' если приложение встраивается в iframe
-
 import os
 from dotenv import load_dotenv
 load_dotenv()
-
-from flask import Flask, render_template, request, redirect, session, url_for, send_file, send_from_directory, render_template_string
-import pandas as pd
 import zipfile
 import io
+from flask import send_file
+from flask import send_from_directory
+from flask import render_template_string
+from flask import Flask, render_template, request, redirect, session, url_for
+import os
+import pandas as pd
 
-# Создание Flask-приложения
-app = Flask(__name__, template_folder="templates")
-app.secret_key = os.environ.get("SECRET_KEY", "очень_секретная_строка")
 
-# Определяем, локально ли мы или на Railway
+
 IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT") == "production"
-app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION  # True только на Railway
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # универсально
+
+app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+
+app = Flask(__name__, template_folder="templates")
+app.secret_key = os.environ.get("SECRET_KEY", "очень_секретная_строка")  # лучше через Railway переменные
+app.config['SESSION_COOKIE_SECURE'] = True  # обязательно для HTTPS
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # или 'None' если приложение встраивается в iframe
 
 
 
@@ -74,12 +56,6 @@ def login():
 
 
 # --- Dashboard ---
-@app.route("/dashboard")
-def dashboard():
-    if "user" not in session:
-        return redirect(url_for("login"))
-    return render_template("dashboard.html", user=session["user"])
-
 @app.route("/view-stock", methods=["GET", "POST"])
 def view_stock():
     if "user" not in session:
@@ -105,47 +81,7 @@ def view_stock():
         save_materials(df)
         return "<p>✅ Остатки обновлены.</p><a href='/view-stock'>↩ Вернуться</a> | <a href='/dashboard'>🏠 В меню</a>"
 
-    # Сборка HTML
-    html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Остатки материалов</title>
-        <style>
-            body { font-family: sans-serif; background: #f7f7f7; padding: 30px; }
-            h2 { color: #333; }
-            table { border-collapse: collapse; width: 100%; background: white; }
-            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-            th { background: #eee; }
-            input[type="text"] { width: 100%; box-sizing: border-box; }
-            button { margin-top: 15px; padding: 10px 20px; background: black; color: white; border: none; cursor: pointer; }
-            button:hover { background: #333; }
-            a { display: inline-block; margin-top: 15px; }
-        </style>
-    </head>
-    <body>
-    <h2>📦 Остатки материалов + Изменения</h2>
-    <form method="post">
-    <table>
-    <tr><th>№</th><th>Название</th><th>Ед.</th><th>Текущий остаток</th><th>Изменение</th></tr>
-    """
-
-    for i, row in df.iterrows():
-        html += f"<tr><td>{i+1}</td><td>{row['Название']}</td><td>{row['Ед. изм.']}</td>"
-        html += f"<td>{row['Остаток']}</td><td><input type='text' name='m_{i}'></td></tr>"
-
-    html += """
-    </table><br>
-    <button type="submit">💾 Сохранить изменения</button>
-    </form>
-    <br><a href='/dashboard'>⬅ Назад</a>
-    </body>
-    </html>
-    """
-
-    return html
-
+    return render_template("view_stock.html", df=df)
 
 
 @app.route("/produce", methods=["GET", "POST"])
