@@ -13,6 +13,8 @@ from flask import Flask, render_template, request, redirect, session, url_for, s
 from logic.salary_logic import get_salary_table
 from logic.stages_logic import register_operation_and_update_stock
 from logic.materials_logic import update_average_prices
+from logic.materials_logic import load_materials
+
 
 IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT") == "production"
 
@@ -62,16 +64,20 @@ def add_purchase():
     if "user" not in session:
         return redirect(url_for("login"))
 
+    from logic.materials_logic import add_purchase, load_materials
+
     if request.method == "POST":
         try:
-            from logic.materials_logic import add_purchase
             form_data = request.form.to_dict(flat=False)
             add_purchase(form_data)
             update_average_prices()
             flash("Поставка успешно добавлена", "success")
         except Exception as e:
             flash(f"Ошибка при сохранении: {str(e)}", "danger")
-    return render_template("add_purchase.html")
+
+    materials = load_materials()
+    return render_template("add_purchase.html", materials=materials)
+
 
 @app.route("/get-salary", methods=["GET"])
 def get_salary():
@@ -88,17 +94,23 @@ def get_salary():
     except Exception as e:
         return f"Ошибка: {str(e)}"
 
-@app.route("/register-operation", methods=["POST"])
+@app.route("/register-operation", methods=["GET", "POST"])
 def register_operation():
     if "user" not in session:
         return redirect(url_for("login"))
-    try:
-        form_data = request.form
-        register_operation_and_update_stock(form_data)
-        flash("Операция зарегистрирована", "success")
-    except Exception as e:
-        flash(f"Ошибка: {str(e)}", "danger")
-    return redirect(url_for("dashboard"))
+
+    if request.method == "POST":
+        try:
+            form_data = request.form
+            register_operation_and_update_stock(form_data)
+            flash("Операция зарегистрирована", "success")
+        except Exception as e:
+            flash(f"Ошибка: {str(e)}", "danger")
+        return redirect(url_for("dashboard"))
+
+    # если просто GET — отрисуй форму
+    return render_template("register_operation.html")
+
 
 @app.route("/download/<filename>")
 def download_file(filename):
