@@ -27,6 +27,22 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 def home():
     return redirect(url_for("login"))
 
+@app.route("/view-stock")
+def view_stock():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    from logic.materials_logic import load_materials
+
+    try:
+        materials = load_materials()
+    except Exception as e:
+        flash(f"Ошибка загрузки остатков: {str(e)}", "danger")
+        materials = []
+
+    return render_template("view_stock.html", materials=materials)
+
+
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -59,15 +75,17 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
+
 @app.route("/add-purchase", methods=["GET", "POST"])
 def add_purchase():
     if "user" not in session:
         return redirect(url_for("login"))
 
-    from logic.materials_logic import add_purchase, load_materials
+    materials = load_materials()  # ← вот это добавь обязательно
 
     if request.method == "POST":
         try:
+            from logic.materials_logic import add_purchase
             form_data = request.form.to_dict(flat=False)
             add_purchase(form_data)
             update_average_prices()
@@ -75,8 +93,8 @@ def add_purchase():
         except Exception as e:
             flash(f"Ошибка при сохранении: {str(e)}", "danger")
 
-    materials = load_materials()
     return render_template("add_purchase.html", materials=materials)
+
 
 
 @app.route("/get-salary", methods=["GET"])

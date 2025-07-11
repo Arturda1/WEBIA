@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Остатки материалов</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Название</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in materials %}
+        <tr>
+            <td>{{ item }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
