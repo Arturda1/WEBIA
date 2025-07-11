@@ -63,15 +63,17 @@ def update_average_prices():
         materials.to_excel(materials_path, index=False)
     except Exception as e:
         raise RuntimeError(f"Ошибка сохранения materials.xlsx: {str(e)}")
-    
-    def load_materials():
-   
-        if not os.path.exists(materials_path):
-            return []
 
-        try:
-            df = pd.read_excel(materials_path)
-            return df["Материал"].dropna().unique().tolist()
-        except Exception as e:
-            raise RuntimeError(f"Ошибка загрузки материалов: {str(e)}")
 
+def load_materials():
+    """
+    Загружает список материалов из materials.xlsx
+    """
+    if not os.path.exists(materials_path):
+        return []
+
+    try:
+        df = pd.read_excel(materials_path)
+        return df["Материал"].dropna().unique().tolist()
+    except Exception as e:
+        raise RuntimeError(f"Ошибка загрузки материалов: {str(e)}")
