@@ -64,6 +64,21 @@ def login():
         return "<b>Неверный логин или пароль</b>"
     return render_template("login.html")
 
+@app.route("/operations-log")
+def operations_log():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    try:
+        df = pd.read_excel("data/operations_log.xlsx")
+        operations = df.to_dict(orient="records")
+    except Exception as e:
+        flash(f"Ошибка чтения журнала операций: {str(e)}", "danger")
+        operations = []
+
+    return render_template("operations_log.html", operations=operations)
+
+
 @app.route("/dashboard")
 def dashboard():
     if "user" not in session:

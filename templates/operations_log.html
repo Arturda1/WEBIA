@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Журнал операций</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Дата</th>
+      <th>Сотрудник</th>
+      <th>Операция</th>
+      <th>Объём</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for op in operations %}
+    <tr>
+      <td>{{ op['Дата'] }}</td>
+      <td>{{ op['Сотрудник'] }}</td>
+      <td>{{ op['Операция'] }}</td>
+      <td>{{ op['Объём'] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
