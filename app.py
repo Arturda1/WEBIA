@@ -1,29 +1,17 @@
-import os
-from dotenv import load_dotenv
-load_dotenv()
-import zipfile
-import io
-from flask import send_file
-from flask import send_from_directory
-from flask import render_template_string
 from flask import Flask, render_template, request, redirect, session, url_for
 import os
+from dotenv import load_dotenv
 import pandas as pd
 
-
-
-IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT") == "production"
-
-app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-
+load_dotenv()
 
 app = Flask(__name__, template_folder="templates")
-app.secret_key = os.environ.get("SECRET_KEY", "очень_секретная_строка")  # лучше через Railway переменные
-app.config['SESSION_COOKIE_SECURE'] = True  # обязательно для HTTPS
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # или 'None' если приложение встраивается в iframe
 
-
+# настройка session после создания app
+IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT") == "production"
+app.secret_key = os.environ.get("SECRET_KEY", "очень_секретная_строчка")
+app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 
 @app.route("/", methods=["GET", "POST"])
