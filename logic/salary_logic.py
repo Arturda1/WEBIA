@@ -16,6 +16,7 @@ def load_rates():
 def log_operation(date, employee, operation, product, qty, rate, total):
     columns = ["Дата", "Сотрудник", "Операция", "Изделие", "Кол-во", "Ставка", "Сумма"]
     new_row = pd.DataFrame([[date, employee, operation, product, qty, rate, total]], columns=columns)
+    os.makedirs("logs", exist_ok=True)
 
     if os.path.exists(LOG_FILE):
         log_df = pd.read_excel(LOG_FILE)
