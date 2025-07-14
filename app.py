@@ -42,6 +42,12 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/dashboard")
+def dashboard():
+    if "user" not in session:
+        return redirect(url_for("login"))
+    return render_template("dashboard.html", user=session["user"])
+
 
 # --- Dashboard ---
 @app.route("/view-stock", methods=["GET", "POST"])
@@ -69,7 +75,8 @@ def view_stock():
         save_materials(df)
         return "<p>✅ Остатки обновлены.</p><a href='/view-stock'>↩ Вернуться</a> | <a href='/dashboard'>🏠 В меню</a>"
 
-    return render_template("view_stock.html", df=df)
+    return render_template("view_stock.html", materials=df.values.tolist())
+
 
 
 @app.route("/produce", methods=["GET", "POST"])

@@ -1,19 +1,28 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h2>Остатки материалов</h2>
-<table>
-    <thead>
+<h2>📦 Остатки материалов + Изменения</h2>
+<form method="post">
+    <table>
         <tr>
+            <th>№</th>
             <th>Название</th>
+            <th>Ед.</th>
+            <th>Текущий остаток</th>
+            <th>Изменение</th>
         </tr>
-    </thead>
-    <tbody>
-        {% for item in materials %}
+        {% for i in range(df|length) %}
         <tr>
-            <td>{{ item }}</td>
+            <td>{{ i + 1 }}</td>
+            <td>{{ df.iloc[i]["Название"] }}</td>
+            <td>{{ df.iloc[i]["Ед. изм."] }}</td>
+            <td>{{ df.iloc[i]["Остаток"] }}</td>
+            <td><input type="text" name="m_{{ i }}"></td>
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+    </table>
+    <br>
+    <button type="submit">💾 Сохранить изменения</button>
+</form>
+<br>
+<a href="/dashboard">⬅ Назад</a>
 {% endblock %}
