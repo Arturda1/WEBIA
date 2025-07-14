@@ -49,6 +49,39 @@ def dashboard():
     return render_template("dashboard.html", user=session["user"])
 
 
+@app.route("/files")
+def download_files():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    from zipfile import ZipFile
+    import io
+    import os
+    from flask import send_file
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(base_dir, "data")
+    zip_stream = io.BytesIO()
+
+    try:
+        with ZipFile(zip_stream, "w") as zipf:
+            for filename in os.listdir(data_dir):
+                filepath = os.path.join(data_dir, filename)
+                if os.path.isfile(filepath) and filename.endswith(".xlsx"):
+                    zipf.write(filepath, arcname=filename)
+
+        zip_stream.seek(0)
+        return send_file(
+            zip_stream,
+            mimetype="application/zip",
+            download_name="all_data_files.zip",
+            as_attachment=True
+        )
+    except Exception as e:
+        return f"Ошибка при создании архива: {str(e)}", 500
+
+
+
 # --- Dashboard ---
 @app.route("/view-stock", methods=["GET", "POST"])
 def view_stock():
