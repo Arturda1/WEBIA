@@ -108,7 +108,8 @@ def view_stock():
         save_materials(df)
         return "<p>✅ Остатки обновлены.</p><a href='/view-stock'>↩ Вернуться</a> | <a href='/dashboard'>🏠 В меню</a>"
 
-    return render_template("view_stock.html", materials=df.values.tolist())
+    return render_template("view_stock.html", df=df)
+
 
 
 
