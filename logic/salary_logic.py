@@ -13,9 +13,10 @@ def load_rates():
         return pd.DataFrame(columns=["Название", "Категория", "Ставка (₽)"])
     return pd.read_excel(RATES_FILE)
 
-def log_operation(date, employee, operation, product, qty, rate, total):
-    columns = ["Дата", "Сотрудник", "Операция", "Изделие", "Кол-во", "Ставка", "Сумма"]
-    new_row = pd.DataFrame([[date, employee, operation, product, qty, rate, total]], columns=columns)
+def log_operation(date, employee, operation, product, qty, rate, total, comment=""):
+    columns = ["Дата", "Сотрудник", "Операция", "Изделие", "Кол-во", "Ставка", "Сумма", "Комментарий"]
+    new_row = pd.DataFrame([[date, employee, operation, product, qty, rate, total, comment]], columns=columns)
+
     os.makedirs("logs", exist_ok=True)
 
     if os.path.exists(LOG_FILE):
@@ -26,7 +27,7 @@ def log_operation(date, employee, operation, product, qty, rate, total):
 
     log_df.to_excel(LOG_FILE, index=False)
 
-def register_operation(employee, operation, qty):
+def register_operation(employee, operation, qty, comment=""):
     if qty <= 0:
         print("⚠️ Кол-во должно быть больше 0.")
         return
@@ -54,7 +55,7 @@ def register_operation(employee, operation, qty):
         print(f"💥 Внутренняя ошибка: {e}")
         return
 
-    log_operation(date, employee, operation, product, qty, rate, total)
+    log_operation(date, employee, operation, product, qty, rate, total, comment)
     print(f"✅ {employee} → {operation} × {qty} → {total} ₽ записано в лог.")
 
 
