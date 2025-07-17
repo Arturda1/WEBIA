@@ -189,9 +189,10 @@ def register_operation_web():
         employee = request.form.get("employee")
         operation = request.form.get("operation")
         qty = int(request.form.get("qty", 1))
+        comment = request.form.get("comment", "").strip()
 
-        print(f"📥 POST-получено: {employee}, {operation}, {qty}")  # debug
-        register_operation(employee, operation, qty)
+        print(f"📥 POST-получено: {employee}, {operation}, {qty}, {comment}")  # debug
+        register_operation(employee, operation, qty, comment)
 
         return redirect(url_for("dashboard"))
 
@@ -215,7 +216,6 @@ def register_operation_web():
         <input type="hidden" name="employee" value="{session['employee']}">
         <p><b>Сотрудник:</b> {session['employee']}</p><br>
 
-
         <label>Категория:</label><br>
         <select id="category" onchange="updateSubcategories()" required></select><br><br>
 
@@ -227,6 +227,9 @@ def register_operation_web():
 
         <label>Количество:</label><br>
         <input name="qty" type="number" value="1" required><br><br>
+
+        <label>Комментарий:</label><br>
+        <input name="comment" type="text" placeholder="(необязательно)"><br><br>
 
         <button type="submit">Зарегистрировать</button>
     </form>
@@ -261,6 +264,7 @@ def register_operation_web():
     }};
     </script>
     """
+
 
 
 
