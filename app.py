@@ -683,6 +683,18 @@ def add_purchase():
     )
 
 
+@app.route("/download-operations-log")
+def download_operations_log():
+    import os
+    from flask import send_file
+
+    log_path = "logs/operations_log.xlsx"
+    if not os.path.exists(log_path):
+        return "<p>⛔ Лог операций пока не создан.</p><a href='/dashboard'>⬅ Назад</a>"
+
+    return send_file(log_path, as_attachment=True)
+
+
 @app.route("/files")
 def list_files():
     files = os.listdir("data")
