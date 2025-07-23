@@ -745,6 +745,95 @@ def debug_users():
         return f"<pre>{json.dumps(json.load(f), ensure_ascii=False, indent=2)}</pre>"
     
 
+from flask import render_template, request, session, redirect, url_for
+import pandas as pd
+from datetime import datetime
+import os
+
+from flask import render_template, session, redirect, url_for
+import pandas as pd
+from datetime import datetime
+import os
+
+from flask import render_template, request, session, redirect, url_for
+import pandas as pd
+from datetime import datetime
+import os
+
+from flask import render_template, session, redirect, url_for
+import pandas as pd
+from datetime import datetime
+import os
+
+@app.route("/personal-report")
+def personal_report():
+    if "employee" not in session:
+        return redirect(url_for("login"))
+
+    employee = session["employee"]
+    now = datetime.now()
+    start_month = datetime(now.year, now.month, 1)
+
+    log_path = os.path.join("logs", "operations_log.xlsx")
+    if not os.path.exists(log_path):
+        return render_template("personal_report.html", employee=employee, monthly=[])
+
+    df = pd.read_excel(log_path)
+    df = df[df["Сотрудник"] == employee]
+    df["Дата"] = pd.to_datetime(df["Дата"])
+    df = df[df["Дата"] >= start_month]
+
+    df["Месяц"] = df["Дата"].dt.to_period("M")
+    months = sorted(df["Месяц"].unique())
+
+    monthly = []
+    for period in months:
+        month_df = df[df["Месяц"] == period]
+        grouped = month_df.groupby("Операция").agg({
+            "Кол-во": "sum",
+            "Брак": "sum",
+            "Ставка": "first"
+        }).reset_index()
+
+        rows = []
+        total_qty = total_defect = total_paid = total_loss = 0
+
+        for _, row in grouped.iterrows():
+            qty = int(row["Кол-во"])
+            defect = int(row["Брак"])
+            rate = float(row["Ставка"])
+            paid = round((qty - defect) * rate, 2)
+            loss = round(defect * rate, 2)
+
+            rows.append({
+                "operation": row["Операция"],
+                "qty": qty,
+                "defect": defect,
+                "paid": paid,
+                "loss": loss
+            })
+
+            total_qty += qty
+            total_defect += defect
+            total_paid += paid
+            total_loss += loss
+
+        monthly.append({
+            "period": str(period),
+            "rows": rows,
+            "total": {
+                "qty": total_qty,
+                "defect": total_defect,
+                "paid": total_paid,
+                "loss": total_loss
+            }
+        })
+
+    return render_template("personal_report.html", employee=employee, monthly=monthly)
+
+
+    
+
 if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)
 

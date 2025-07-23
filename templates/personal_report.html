@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="text-center mb-4">Личный кабинет: {{ employee }}</h2>
+
+  {% if monthly %}
+    {% for block in monthly %}
+    <div class="mb-5">
+      <h4 class="mb-3">Период: {{ block.period }}</h4>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Операция</th>
+              <th>Всего выполнено</th>
+              <th>Брак</th>
+              <th>Начислено (₽)</th>
+              <th>Потери от брака (₽)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in block.rows %}
+            <tr>
+              <td>{{ row.operation }}</td>
+              <td>{{ row.qty }}</td>
+              <td>{{ row.defect }}</td>
+              <td>{{ row.paid }}</td>
+              <td>{{ row.loss }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="table-light">
+            <tr>
+              <th>Итого</th>
+              <th>{{ block.total.qty }}</th>
+              <th>{{ block.total.defect }}</th>
+              <th>{{ block.total.paid }}</th>
+              <th>{{ block.total.loss }}</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-center text-muted">Нет данных за текущий месяц.</p>
+  {% endif %}
+</div>
+{% endblock %}
