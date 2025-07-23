@@ -760,11 +760,6 @@ import pandas as pd
 from datetime import datetime
 import os
 
-from flask import render_template, session, redirect, url_for
-import pandas as pd
-from datetime import datetime
-import os
-
 @app.route("/personal-report")
 def personal_report():
     if "employee" not in session:
@@ -783,13 +778,20 @@ def personal_report():
     df["Дата"] = pd.to_datetime(df["Дата"])
     df = df[df["Дата"] >= start_month]
 
-    df["Месяц"] = df["Дата"].dt.to_period("M")
-    months = sorted(df["Месяц"].unique())
+    def get_half_period(dt):
+        if dt.day <= 15:
+            return dt.strftime("%Y-%m-01 to %Y-%m-15")
+        else:
+            last_day = (dt.replace(day=28) + pd.offsets.MonthEnd(0)).day
+            return dt.strftime(f"%Y-%m-16 to %Y-%m-{last_day:02d}")
+
+    df["Период"] = df["Дата"].apply(get_half_period)
+    periods = sorted(df["Период"].unique())
 
     monthly = []
-    for period in months:
-        month_df = df[df["Месяц"] == period]
-        grouped = month_df.groupby("Операция").agg({
+    for period in periods:
+        period_df = df[df["Период"] == period]
+        grouped = period_df.groupby("Операция").agg({
             "Кол-во": "sum",
             "Брак": "sum",
             "Ставка": "first"
@@ -819,7 +821,7 @@ def personal_report():
             total_loss += loss
 
         monthly.append({
-            "period": str(period),
+            "period": period,
             "rows": rows,
             "total": {
                 "qty": total_qty,
@@ -830,7 +832,6 @@ def personal_report():
         })
 
     return render_template("personal_report.html", employee=employee, monthly=monthly)
-
 
     
 
