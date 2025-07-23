@@ -198,9 +198,11 @@ def register_operation_web():
         operation = request.form.get("operation")
         qty = int(request.form.get("qty", 1))
         comment = request.form.get("comment", "").strip()
+        defective_qty = int(request.form.get("defective_qty", 0))
+
 
         print(f"📥 POST-получено: {employee}, {operation}, {qty}, {comment}")  # debug
-        register_operation(employee, operation, qty, comment)
+        register_operation(employee, operation, qty, comment, defective_qty)
 
         return redirect(url_for("dashboard"))
 

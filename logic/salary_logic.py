@@ -7,15 +7,20 @@ from logic.products_logic import add_product_stock
 RATES_FILE = "data/operation_rates.xlsx"
 LOG_FILE = "logs/operations_log.xlsx"
 
+
 def load_rates():
     if not os.path.exists(RATES_FILE):
         print("❌ Файл operation_rates.xlsx не найден.")
         return pd.DataFrame(columns=["Название", "Категория", "Ставка (₽)"])
     return pd.read_excel(RATES_FILE)
 
-def log_operation(date, employee, operation, product, qty, rate, total, comment=""):
-    columns = ["Дата", "Сотрудник", "Операция", "Изделие", "Кол-во", "Ставка", "Сумма", "Комментарий"]
-    new_row = pd.DataFrame([[date, employee, operation, product, qty, rate, total, comment]], columns=columns)
+
+def log_operation(date, employee, operation, product, qty, rate, total, comment="", defective_qty=0):
+    columns = ["Дата", "Сотрудник", "Операция", "Изделие", "Кол-во", "Ставка", "Сумма", "Комментарий", "Брак"]
+    new_row = pd.DataFrame(
+        [[date, employee, operation, product, qty, rate, total, comment, defective_qty]],
+        columns=columns
+    )
 
     os.makedirs("logs", exist_ok=True)
 
@@ -27,7 +32,8 @@ def log_operation(date, employee, operation, product, qty, rate, total, comment=
 
     log_df.to_excel(LOG_FILE, index=False)
 
-def register_operation(employee, operation, qty, comment=""):
+
+def register_operation(employee, operation, qty, comment="", defective_qty=0):
     if qty <= 0:
         print("⚠️ Кол-во должно быть больше 0.")
         return
@@ -40,8 +46,9 @@ def register_operation(employee, operation, qty, comment=""):
         return
 
     rate = rate_row.iloc[0]["Ставка (₽)"]
-    total = round(rate * qty, 2)
-    date = datetime.now()  # ← сохраняем как datetime, не строку
+    valid_qty = max(qty - defective_qty, 0)
+    total = round(rate * valid_qty, 2)
+    date = datetime.now()
 
     product = operation
 
@@ -55,12 +62,12 @@ def register_operation(employee, operation, qty, comment=""):
         print(f"💥 Внутренняя ошибка: {e}")
         return
 
-    log_operation(date, employee, operation, product, qty, rate, total, comment)
+    log_operation(date, employee, operation, product, qty, rate, total, comment, defective_qty)
     print(f"✅ {employee} → {operation} × {qty} → {total} ₽ записано в лог.")
 
 
 def operation_input_menu():
-    print("\\n📋 Ввод выполненных операций")
+    print("\n📋 Ввод выполненных операций")
 
     employee = input("Сотрудник: ").strip()
     if not employee:
@@ -75,7 +82,7 @@ def operation_input_menu():
     operations = rates["Название"].tolist()
 
     while True:
-        print("\\n🔁 Выберите операцию (или '0' — выйти в меню):")
+        print("\n🔁 Выберите операцию (или '0' — выйти в меню):")
         for idx, op in enumerate(operations, 1):
             print(f"  {idx}. {op}")
 
@@ -100,5 +107,10 @@ def operation_input_menu():
             print("❌ Некорректное число.")
             continue
 
-        register_operation(employee, operation, qty)
+        defective_input = input("Брак (шт, по умолчанию 0): ").strip()
+        try:
+            defective_qty = int(defective_input or "0")
+        except ValueError:
+            defective_qty = 0
 
+        register_operation(employee, operation, qty, comment="", defective_qty=defective_qty)
