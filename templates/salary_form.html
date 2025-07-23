@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2 class="mb-4 text-center">🛠️ Произведённые работы</h2>
+  <form method="post" class="mb-4">
+    {{ employee_select|safe }}
+    <div class="mb-3">
+      <label class="form-label">Период:</label>
+      <select name="period" class="form-select">{{ period_options|safe }}</select>
+    </div>
+    <button type="submit" class="btn btn-primary">Рассчитать</button>
+  </form>
+  <a href="/dashboard" class="btn btn-outline-secondary">⬅ Назад</a>
+{% endblock %}

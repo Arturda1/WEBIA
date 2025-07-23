@@ -3,6 +3,10 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 
+
+
+
+
 load_dotenv()
 
 app = Flask(__name__, template_folder="templates")
@@ -12,6 +16,10 @@ IS_PRODUCTION = os.getenv("RAILWAY_ENVIRONMENT") == "production"
 app.secret_key = os.environ.get("SECRET_KEY", "очень_секретная_строчка")
 app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+
+
+
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -209,61 +217,11 @@ def register_operation_web():
 
     data_json = json.dumps(structured, ensure_ascii=False)
 
-    return f"""
-    <h2>🧾 Регистрация операции</h2>
-    <form method="post">
-        <label>Сотрудник:</label><br>
-        <input type="hidden" name="employee" value="{session['employee']}">
-        <p><b>Сотрудник:</b> {session['employee']}</p><br>
+    return render_template("register_operation.html",
+                       employee=session["employee"],
+                       data_json=data_json)
 
-        <label>Категория:</label><br>
-        <select id="category" onchange="updateSubcategories()" required></select><br><br>
 
-        <label>Подкатегория:</label><br>
-        <select id="subcategory" onchange="updateOperations()" required></select><br><br>
-
-        <label>Операция:</label><br>
-        <select name="operation" id="operation" required></select><br><br>
-
-        <label>Количество:</label><br>
-        <input name="qty" type="number" value="1" required><br><br>
-
-        <label>Комментарий:</label><br>
-        <input name="comment" type="text" placeholder="(необязательно)"><br><br>
-
-        <button type="submit">Зарегистрировать</button>
-    </form>
-
-    <a href="/dashboard">⬅ Назад</a>
-
-    <script>
-    const data = {data_json};
-
-    function updateSubcategories() {{
-        const cat = document.getElementById("category").value;
-        const subs = Object.keys(data[cat] || {{}});
-
-        const subSelect = document.getElementById("subcategory");
-        subSelect.innerHTML = subs.map(s => `<option value="${{s}}">${{s}}</option>`).join('');
-        updateOperations();
-    }}
-
-    function updateOperations() {{
-        const cat = document.getElementById("category").value;
-        const sub = document.getElementById("subcategory").value;
-        const ops = (data[cat] && data[cat][sub]) || [];
-
-        const opSelect = document.getElementById("operation");
-        opSelect.innerHTML = ops.map(o => `<option value="${{o}}">${{o}}</option>`).join('');
-    }}
-
-    window.onload = () => {{
-        const catSelect = document.getElementById("category");
-        catSelect.innerHTML = Object.keys(data).map(c => `<option value="${{c}}">${{c}}</option>`).join('');
-        updateSubcategories();
-    }};
-    </script>
-    """
 
 
 
@@ -309,10 +267,25 @@ def operations_log():
     '''
     for col in df.columns:
         html += f"<th>{col}</th>"
+    html += "<th>Действия</th></tr>"
+
+
+    for i, row in df.iterrows():
+        html += "<tr>"
+        for col in df.columns:
+            html += f"<td>{row[col]}</td>"
+        html += f"""
+            <td>
+            <a href='/edit-operation/{i}'>✏️</a>
+            <form action='/delete-operation/{i}' method='post' style='display:inline' onsubmit="return confirm('Удалить запись?');">
+                <button type='submit' style='border:none; background:none; color:red;'>🗑</button>
+            </form>
+            </td>
+        """
+        html += "</tr>"
+
     html += "</tr>"
 
-    for _, row in df.iterrows():
-        html += "<tr>" + "".join([f"<td>{row[col]}</td>" for col in df.columns]) + "</tr>"
 
     html += "</table><br>"
 
@@ -366,9 +339,11 @@ def salary_report():
     df = pd.read_excel(path)
     df["Дата"] = pd.to_datetime(df["Дата"], errors="coerce")
 
-    if request.method == "POST":
-        employee = request.form.get("employee").strip()
-        period_str = request.form.get("period", "")
+    # 👉 Если задан сотрудник и период — рендерим таблицу зарплаты
+    if request.method == "POST" or ("employee" in request.args and "period" in request.args):
+        employee = (request.form.get("employee") or request.args.get("employee") or "").strip()
+        period_str = request.form.get("period") or request.args.get("period") or ""
+
         if not employee or "," not in period_str:
             return "<p>❌ Заполните все поля.</p><a href='/salary-report'>⬅ Назад</a>"
 
@@ -383,19 +358,18 @@ def salary_report():
 
         total = round(filtered["Сумма"].sum(), 2)
 
-        html = f"<h2>💰 Зарплата: {employee}</h2>"
-        html += f"<p>Период: {start_str} — {end_str}</p>"
-        html += "<table border='1' cellpadding='5'><tr>"
-        for col in filtered.columns:
-            html += f"<th>{col}</th>"
-        html += "</tr>"
-        for _, row in filtered.iterrows():
-            html += "<tr>" + "".join([f"<td>{row[col]}</td>" for col in filtered.columns]) + "</tr>"
-        html += f"</table><br><h3>Итого: {total} ₽</h3>"
-        html += "<a href='/salary-report'>↩ Назад</a> | <a href='/dashboard'>🏠 В меню</a>"
-        return html
+        return render_template(
+            "salary_result.html",
+            start=start_str,
+            end=end_str,
+            columns=filtered.columns,
+            rows=filtered.reset_index().to_dict(orient="records"),
+            employee=employee,
+            period=period_str,
+            total=total
+        )
 
-    # --- Формирование списка сотрудников ---
+    # --- Формирование формы выбора ---
     if current_employee == "админ":
         employees = df["Сотрудник"].dropna().unique().tolist()
         employee_select = "<label>Сотрудник:</label><br><select name='employee'>" + "".join(
@@ -424,16 +398,12 @@ def salary_report():
         value = f"{start.date()},{end.date()}"
         period_options += f"<option value='{value}'>{label}</option>"
 
-    return f'''
-        <h2>🧮 Расчёт зарплаты</h2>
-        <form method="post">
-            {employee_select}
-            <label>Период:</label><br>
-            <select name="period">{period_options}</select><br><br>
-            <button type="submit">Рассчитать</button>
-        </form>
-        <a href="/dashboard">⬅ Назад</a>
-    '''
+    return render_template(
+    "salary_form.html",
+    employee_select=employee_select,
+    period_options=period_options
+)
+
 
 
 
@@ -686,6 +656,45 @@ def add_purchase():
         expense_types=expense_types
     )
 
+@app.route("/edit-operation/<int:index>", methods=["GET", "POST"])
+def edit_operation(index):
+    import pandas as pd
+    path = "logs/operations_log.xlsx"
+    df = pd.read_excel(path)
+
+    if request.method == "POST":
+        for col in df.columns:
+            df.at[index, col] = request.form.get(col)
+        df.to_excel(path, index=False)
+        return redirect(url_for("operations_log"))
+
+    row = df.iloc[index]
+    html = f"<h2>✏️ Редактировать операцию #{index + 1}</h2><form method='post'>"
+    for col in df.columns:
+        html += f"<label>{col}:</label><br><input name='{col}' value='{row[col]}'><br><br>"
+    html += "<button type='submit'>💾 Сохранить</button></form><br><a href='/operations-log'>⬅ Назад</a>"
+    return html
+
+@app.route("/delete-operation/<int:index>", methods=["POST"])
+def delete_operation(index):
+    import pandas as pd
+    path = "logs/operations_log.xlsx"
+    df = pd.read_excel(path)
+    df = df.drop(index).reset_index(drop=True)
+    df.to_excel(path, index=False)
+
+    # куда вернуть
+    redirect_url = request.form.get("redirect_to", "/operations-log")
+    employee = request.form.get("employee")
+    period = request.form.get("period")
+
+    if "salary-report" in redirect_url and employee and period:
+        return redirect(f"{redirect_url}?employee={employee}&period={period}")
+    
+    return redirect(redirect_url)
+
+
+
 
 
 
@@ -734,22 +743,8 @@ def debug_users():
         return f"<pre>{json.dumps(json.load(f), ensure_ascii=False, indent=2)}</pre>"
     
 
-    
-    
 if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)
 
 
-   
-
-
-
-
-#if __name__ == "__main__":
-    if os.environ.get("RAILWAY_ENVIRONMENT") == "production":
-        # Для Railway — НЕ ТРОГАЙ
-        app.run(host="0.0.0.0", port=8000)
-    else:
-        # Локальный запуск
-        app.run(debug=True, port=5000)
 

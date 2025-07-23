@@ -1,9 +1,41 @@
-<!-- templates/salary_result.html -->
 {% extends "base.html" %}
 {% block content %}
-  <h2>Зарплата за период {{ start }} – {{ end }}</h2>
-  <div>
-    {{ table_html|safe }}
+  <h2 class="mb-4 text-center">🛠️ Работы за период {{ start }} – {{ end }}</h2>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped table-sm text-center align-middle">
+      <thead class="table-light">
+        <tr>
+          {% for col in columns %}
+            <th>{{ col }}</th>
+          {% endfor %}
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            {% for col in columns %}
+              <td>{{ row[col] }}</td>
+            {% endfor %}
+            <td>
+              <form action="/delete-operation/{{ row['index'] }}" method="post" style="display:inline" onsubmit="return confirm('Удалить запись?');">
+                <input type="hidden" name="redirect_to" value="/salary-report">
+                <input type="hidden" name="employee" value="{{ employee }}">
+                <input type="hidden" name="period" value="{{ period }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger">🗑</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
-  <a href="{{ url_for('dashboard') }}">Назад</a>
+
+  <h4 class="text-end mt-4">Общая сумма: <strong>{{ total }} ₽</strong></h4>
+
+  <div class="mt-3">
+    <a href="/salary-report" class="btn btn-outline-secondary">↩ Назад</a>
+    <a href="/dashboard" class="btn btn-outline-primary">🏠 В меню</a>
+  </div>
 {% endblock %}
